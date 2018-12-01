@@ -4,6 +4,11 @@ def extract(dct, namespace=None):
     if not namespace: namespace = globals()
     namespace.update(dct)
 
+def rsf(filename, namespace=None, printname=None):
+    f = open(filename, "r")
+    lyrics = f.read()
+    rs(lyrics, namespace, printname)
+
 def rs(lyrics, namespace=None, printname=None):
     transpiler = Transpiler()
     if printname:

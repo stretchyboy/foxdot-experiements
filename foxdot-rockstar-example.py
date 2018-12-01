@@ -3,6 +3,8 @@ from foxdotrockstar import *
 #Transpile the following rockstar code into python and run it
 #code runs between the '''s 
 #in the rockstar code ()s are comments
+rsf("tommy.rock", locals(),"tommies")
+
 rs('''
 Papa was a rolling stone (Papa = 175)
 
@@ -40,4 +42,3 @@ p1 >> pluck([0,4]).every(3, "loving")
 d1 >> play("x-o-").every(Pvar(tommies), "stutter")
 # And cancel it with
 #p1.never("loving")
-
