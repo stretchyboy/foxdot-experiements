@@ -1,4 +1,5 @@
-Tommy was a dancer
-While Tommy ain't 0
-Shout Tommy
-Knock Tommy down
+(loops down from 16)
+Tommy was a docker (Tommy = 16)
+While Tommy ain't nothing (while Tommy != null equivelant to Tommy != 0)
+Scream Tommy
+Knock him down (Tommy = Tommy - 1)
