@@ -1,4 +1,10 @@
+import traceback
+import sys
+import timeout_decorator
+
 from rockstarpy.transpile import Transpiler
+
+transpiler = Transpiler()
 
 def extract(dct, namespace=None):
     if not namespace: namespace = globals()
@@ -9,8 +15,8 @@ def rsf(filename, namespace=None, printname=None):
     lyrics = f.read()
     rs(lyrics, namespace, printname)
 
+@timeout_decorator.timeout(5)
 def rs(lyrics, namespace=None, printname=None):
-    transpiler = Transpiler()
     if printname:
         converted_code = printname+" = [] \n"
     else:
@@ -25,8 +31,19 @@ def rs(lyrics, namespace=None, printname=None):
     if printname:
         converted_code +="print("+printname+")"
 
-    ##print(converted_code)
-    exec(converted_code)
+    print(converted_code)
 
-    extract(locals(), namespace)
+    try:
+        exec(converted_code)
+        extract(locals(), namespace)
+    except SyntaxError:
+        print ("Your words don't mean much too me. (Syntax error)")
     #return converted_code
+
+if __name__ == '__main__':
+    rs('''
+Tommy was a docker
+While Tommy ain't nothing
+Scream Tommy
+Knock Tommy down
+''', locals())
