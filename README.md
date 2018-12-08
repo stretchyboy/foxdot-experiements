@@ -12,6 +12,14 @@ so far we have a :
 
 ### Instructions
 
+Start up FoxDot as normal
+
+Before trying to run any Rockstar run this line
+
+```
+from foxdotrockstar import *
+```
+
 #### rs(lyrics, namespace=None, printname=None)
 Use rockstar in-line
 ```
