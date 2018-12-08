@@ -2,23 +2,23 @@ from foxdotrockstar import *
 
 rsf("Midnight.rock", locals())
 
-rsf("tommy.rock", locals(), "tommies")
+stalk("tommy.rock", locals(), "tommies")
 
 rsf("Getting There.rock", locals(), "places") 
 
-rsf("FizzBuzz.rock", locals(), "fizzbuzz")
-
-Clock.bpm = 2*Midnight(Papa, 100)
 
 
-d1 >> play(P["x-o-"]#.every(3, "bubble")#.every(4, "amen"))
+Clock.bpm = 90 #2*Midnight(Papa, 100)
+
+
+d1 >> play(P["x-o-"])#.every(3, "bubble")#.every(4, "amen"))
 
 @PlayerMethod
 def loving(self):
     global Clock
     Clock.bpm = Lovin(Clock.bpm, 10)
 
-
+rsf("FizzBuzz.rock", locals(), "fizzbuzz")
 p1 >> bass(fizzbuzz, dur=PDur(17, 24))#.every(10, "loving")
 
 
@@ -32,4 +32,4 @@ print(Clock.bpm)
 
 d1.never("loving")
 
-d1 >> play("x($%)(-x)[<o->*]", dist=0.5).every(12, "reverse").every(5, "stutter").every(10, "loving")
+d1 >> play("x($%)(-x)[<o->*]", dist=0.5).every(12, "reverse").every(5, "stutter",)

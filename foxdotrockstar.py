@@ -51,25 +51,48 @@ observer = Observer()
 observer.start()
 #observer.stop()
 
+watches = {}
+
+
+def dosomat(event):
+    logger.info("doing somat")
+
+    if event.event_type == 'modified':
+        # Taken any action here when a file is modified.
+        logger.info( "Received modified event - %s." % event.src_path)
+        # TODO check its the right file ??
+
+        for func in watches:
+            watches[func]()
+
+
+some = FileSystemEventHandler()
+some.on_any_event = dosomat
+observer.schedule(some, ".")
+
+
 transpiler = Transpiler()
 
 def extract(dct, namespace=None):
     if not namespace: namespace = globals()
     namespace.update(dct)
 
-def rsf(filename, namespace=None, printname=None):
-    logger.info("Running rsf "+filename)
+def _rsf(filename, namespace=None, printname=None):
+    logger.info("Running _rsf "+filename)
     f = open(filename, "r")
     lyrics = f.read()
     logger.info("lyrics length "+str(len(lyrics)))
     rs(lyrics, namespace, printname)
 
-def stalk(filename, namespace=None, printname=None):
-    rsf(filename, namespace, printname)
-    event_handler = UpdaterHandler(filename, namespace, printname)
-    observer.schedule(event_handler, ".")
+@timeout_decorator.timeout(5)
+def rsf(filename, namespace=None, printname=None):
+    _rsf(filename, namespace, printname)
 
-#@timeout_decorator.timeout(5)
+def stalk(filename, namespace=None, printname=None):
+    _rsf(filename, namespace, printname)
+    do_rsf = functools.partial(_rsf, filename, namespace=namespace, printname=printname)
+    watches[filename] = do_rsf
+
 def rs(lyrics, namespace=None, printname=None):
     if printname:
         converted_code = printname+" = [] \n"
