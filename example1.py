@@ -1,26 +1,15 @@
 from foxdotrockstar import *
-
-d1 >> play("[-x] [( X($    *      [*[%]]     )X)]+", sample=P([0,1,2,3],15))
-
-rsf("Midnight.rock", locals())
-
 stalk("tommy.rock", locals(), "tommies")
 
-rsf("Getting There.rock", locals(), "places") 
-
-
+p1 >> arpy(tommies)
 
 Clock.bpm = 90 #2*Midnight(Papa, 100)
 
 
 d1 >> play(P["x-o-"])#.every(3, "bubble")#.every(4, "amen"))
 
-@PlayerMethod
-def loving(self):
-    global Clock
-    Clock.bpm = Lovin(Clock.bpm, 10)
+stalk("FizzBuzz.rock", locals(), "fizzbuzz")
 
-rsf("FizzBuzz.rock", locals(), "fizzbuzz")
 p1 >> bass(fizzbuzz, dur=PDur(17, 24))#.every(10, "loving")
 
 
@@ -32,6 +21,10 @@ print(SynthDefs)
 
 print(Clock.bpm)
 
-d1.never("loving")
+#@PlayerMethod
+#def loving(self):
+#    global Clock
+#    Clock.bpm = Lovin(Clock.bpm, 10)
 
-d1 >> play("x($%)(-x)[<o->*]", dist=0.5).every(12, "reverse").every(5, "stutter",)
+#d1.never("loving")
+
