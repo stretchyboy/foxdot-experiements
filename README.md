@@ -9,6 +9,7 @@ so far we have a :
 ## For the Rockstar code
  * use python3
  * pip3 install numpy timeout_decorator watchdog
+ * pip3 install -U git+https://github.com/yanorestes/rockstar-py.git
 
 ### Instructions
 
