@@ -1,0 +1,6 @@
+[
+  {
+    "files": "*.py",
+    "command": "git commit -a ${srcFile} -m \"Algorave live\""
+  }
+]
