@@ -1,0 +1,6 @@
+[
+  {
+    "files": "*.py",
+    "command": "git add \"${srcFile}\"; git commit -m \"Stash test\""
+  }
+]
