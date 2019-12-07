@@ -1,22 +1,15 @@
+Scale.default = Scale.major
+
+start=nextbar
+
 print(SynthDefs)
 
 bmp = linvar([180,220], [32, inf], start=nextbar)
 Clock.update_tempo(bmp)
 
-
 amp=linvar([1,0], [32, inf], start=nextbar)
 
-Scale.default = Scale.major
-
-chords  + (0,1,2)
-
-
-p2.reset() >> pluck([0, 2, 4, 7])
-
-, start=nextbar
-
-
-bits=12, striate=P[0,8,4])
+#chords  + (0,1,2)
 
 '''
 noise great for quick effect
