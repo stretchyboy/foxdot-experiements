@@ -11,4 +11,4 @@ p1 >> pads(dur=PDur(PRange(2,10),[10,12])).follow(b1) + (P[1,2,1]^P(0,2,1).bubbl
 
 p1.every(10, "reverse")
 
-p1.every(3, "stutter", 4, oct=4, pan=[-1,1])
+p1.every(12, "stutter", 4, oct=4, pan=[-1,1])
