@@ -23,7 +23,7 @@ p_all.amp=linvar([0.5,0], [16, inf], start=nextbar)
 ##################################################################################
 # Created with stems2foxdot by stretch
 # From Xenon
-# ©  with Permission
+# © Rabbit Junk with Permission
 ###################################################################################
 Samples.addPath("/home/meggleton/Projects/algorave/stems/Xenon")
 
@@ -46,7 +46,7 @@ s5 >> loop('xenon_keys_01', P[2,4,5,2,1], sample=2, amp=Pvar([1,1],[8]), dur=1, 
 ##################################################################################
 # Created with stems2foxdot by stretch
 # From Gravity Hero
-# ©  with Permission
+# © Rabbit Junk with Permission
 ###################################################################################
 Samples.addPath("/home/meggleton/Projects/algorave/stems/Gravity Hero")
 Clock.bpm = 175
@@ -60,7 +60,7 @@ s1 >> loop('gravity_hero_loops_01',  P[:8,2,0,2,1,10,8,2,1].palindrome(), sample
 ##################################################################################
 # Created with stems2foxdot by stretch
 # From Bullet
-# ©  with Permission
+# © Hyro the Hero with Permission
 ###################################################################################
 Samples.addPath("/home/meggleton/Projects/algorave/stems/Bullet")
 Clock.bpm = 110
