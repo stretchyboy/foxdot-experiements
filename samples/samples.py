@@ -47,26 +47,34 @@ class Tone(db.Entity):
             map.append(lowsample)
         self.notes_map = map
 
-    def getSample(self, midi):
+    def getClosestSample(self, midi):
         sampleid = self.notes_map[midi]
-        return self.samples[sampleid]
+        if(sampleid):
+            return Sample[sampleid]
+        return False
 
+    def getNotePlayInfo(self, midi):
+        sample = self.getClosestSample(midi)
+        if(sample):
+            transform = sample.getTransform(midi)
+            return (sample.filename, transform)
+        return False
+
+def getFileName(name, sample=0):
+    return '{0:03d}_'.format(sample)+name
+    #return '{0:03d}_'.format(sample)+("".join(x for x in name if x.isalnum()).lower()) + ".wav"
 
 class Sample(db.Entity):
     id = PrimaryKey(int, auto=True)
     name = Required(str)
+    filename = Required(str)
+    sample = Required(int)
     tone = Required(Tone)
     length = Optional(int)
     bmp = Optional(int)
     midi = Required(int)
     notes = Set('Note')
     source = Optional(str)
-
-    def getFilePath(self):
-        file = "".join(x for x in self.name if x.isalnum())
-        dir = self.tone.getFolderPath()
-        path = os.path.join(dir, file)
-        return path
 
     def score(self, midi):
         densityscore = 0
@@ -85,58 +93,157 @@ class Sample(db.Entity):
         notename = None,
         octave = None
      ):
+
         name = os.path.basename(inputfilepath)
-        #print("name", name)
+        #samples = Sample.select(tone=tone).count()
+        sample = select(s for s in Sample if s.tone == tone).count()
+
+        print("sample", sample)
+        filename = getFileName(name, sample)
+        print("filename", filename)
+
         if(notename and octave):
             p = pitch.Pitch(notename)
             p.octave = octave
             midi = p.midi
+
         super().__init__(
             tone = tone,
             name = name,
-            midi=midi,
-            bmp = bmp
+            midi = midi,
+            bmp = bmp,
+            sample=sample,
+            filename=filename
             )
-        file = "".join(x for x in name if x.isalnum())
+
         dir = tone.getFolderPath()
-        path = os.path.join(dir, file)
+        path = os.path.join(dir, filename)
         copyfile(inputfilepath, path)
 
+    def after_delete(self):
+        self.tone.makeMap()
 
+    def after_insert(self):
+        self.tone.makeMap()
+
+    def after_update():
+        self.tone.makeMap()
 
 class Note(db.Entity):
     id = PrimaryKey(int, auto=True)
     sample = Required(Sample)
-    beat = Required(int)
-    note = Required(int)
+    startatbeat = Required(int)
+    endatbeat = Required(int)
+    midi = Required(int)
 
 
 db.generate_mapping(create_tables=True)
 
+@db_session
+def get_or_create_tone(name):
+    if Tone.exists(name=name):
+        return Tone.get(name=name)
+    return Tone(name=name)
 
+@db_session
+def get_or_create_tone_from_sample(
+    inputfilepath=None,
+    bmp = None,
+    midi = None,
+    notename = None,
+    octave = None):
 
+    tonefolderpath = os.path.dirname(inputfilepath)
+    tonefolder = os.path.basename(tonefolderpath)
+    #print("tonefolder", tonefolder)
+
+    t = get_or_create_tone(tonefolder)
+    s = get_or_create_sample(
+        inputfilepath=inputfilepath,
+        tone=t,
+        bmp = bmp,
+        midi = midi,
+        notename = notename,
+        octave = octave)
+
+    #t.makeMap()
+
+    return t,s
+
+@db_session
+def get_or_create_sample(
+    inputfilepath=None,
+    tone=None,
+    bmp = None,
+    midi = None,
+    notename = None,
+    octave = None):
+
+    if(notename and octave):
+        p = pitch.Pitch(notename)
+        p.octave = octave
+        midi = p.midi
+
+    if Sample.exists(tone=tone, midi=midi):
+        return Sample.get(tone=tone, midi=midi)
+    return Sample(
+        inputfilepath=inputfilepath,
+        tone=tone,
+        bmp = bmp,
+        midi = midi,
+        notename = notename,
+        octave = octave)
+'''
+with db_session:
+    t = get_or_create_tone('Fingered (bridge pickup) Rickenbacker bass (4001 - 1974)')
+
+    s1 = get_or_create_sample(
+        inputfilepath = "/home/meggleton/Downloads/Fingered (bridge pickup) Rickenbacker bass (4001 - 1974)/163021__project16__d-3-pp.wav",
+        tone=t,
+        notename = "D",
+        octave = 3)
+
+    s2 = get_or_create_sample(
+        inputfilepath = "/home/meggleton/Downloads/Fingered (bridge pickup) Rickenbacker bass (4001 - 1974)/162995__project16__f-3-pp.wav",
+        tone=t,
+        notename = "F",
+        octave = 3)
+
+    s3 = get_or_create_sample(
+        inputfilepath = "/home/meggleton/Downloads/Fingered (bridge pickup) Rickenbacker bass (4001 - 1974)/162969__project16__a2-pp.wav",
+        tone=t,
+        notename = "A",
+        octave = 2)
+'''
 
 with db_session:
-    t = Tone(name='Fingered (bridge pickup) Rickenbacker bass (4001 - 1974)')
-    filepath = "/home/meggleton/Downloads/Fingered (bridge pickup) Rickenbacker bass (4001 - 1974)/163021__project16__d-3-pp.wav"
-    s = Sample(inputfilepath=filepath,
-    tone=t,
-    notename = "D",
-    octave = 3)
+    t, s = get_or_create_tone_from_sample(
+        inputfilepath = "/home/meggleton/Downloads/Fingered (bridge pickup) Rickenbacker bass (4001 - 1974)/163021__project16__d-3-pp.wav",
+        notename = "D",
+        octave = 3)
 
-    filepath = "/home/meggleton/Downloads/Fingered (bridge pickup) Rickenbacker bass (4001 - 1974)/162995__project16__f-3-pp.wav"
-    s = Sample(inputfilepath=filepath,
-    tone=t,
-    notename = "F",
-    octave = 3)
+    t, s = get_or_create_tone_from_sample(
+        inputfilepath = "/home/meggleton/Downloads/Fingered (bridge pickup) Rickenbacker bass (4001 - 1974)/162995__project16__f-3-pp.wav",
+        notename = "F",
+        octave = 3)
+
+    t, s = get_or_create_tone_from_sample(
+        inputfilepath = "/home/meggleton/Downloads/Fingered (bridge pickup) Rickenbacker bass (4001 - 1974)/162969__project16__a2-pp.wav",
+        notename = "A",
+        octave = 2)
+
+    print(t.getNotePlayInfo(60))
 
 
-    filepath = "/home/meggleton/Downloads/Fingered (bridge pickup) Rickenbacker bass (4001 - 1974)/162969__project16__a2-pp.wav"
-    s = Sample(inputfilepath=filepath,
-    tone=t,
-    notename = "A",
-    octave = 2)
+def main():
+    import argparse
 
-with db_session:
-    t = Tone[1]
-    t.makeMap()
+    parser = argparse.ArgumentParser(description='Create Samples From a Folder of Stems.')
+    parser.add_argument('path', metavar='PATH', type=str,
+                        help='Path to stems folder')
+
+    parser.add_argument('-b','--bpm', type=int, nargs='?', default=110,
+                        help='BPM of stems')
+
+if __name__ == "__main__":
+    main()
