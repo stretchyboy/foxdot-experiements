@@ -71,7 +71,7 @@ class Sample(db.Entity):
     sample = Required(int)
     tone = Required(Tone)
     length = Optional(int)
-    bmp = Optional(int)
+    bpm = Optional(int)
     midi = Required(int)
     notes = Set('Note')
     source = Optional(str)
@@ -88,7 +88,7 @@ class Sample(db.Entity):
     def __init__(self,
         inputfilepath=None,
         tone=None,
-        bmp = None,
+        bpm = None,
         midi = None,
         notename = None,
         octave = None
@@ -111,7 +111,7 @@ class Sample(db.Entity):
             tone = tone,
             name = name,
             midi = midi,
-            bmp = bmp,
+            bpm = bpm,
             sample=sample,
             filename=filename
             )
@@ -148,7 +148,7 @@ def get_or_create_tone(name):
 @db_session
 def get_or_create_tone_from_sample(
     inputfilepath=None,
-    bmp = None,
+    bpm = None,
     midi = None,
     notename = None,
     octave = None):
@@ -161,7 +161,7 @@ def get_or_create_tone_from_sample(
     s = get_or_create_sample(
         inputfilepath=inputfilepath,
         tone=t,
-        bmp = bmp,
+        bpm = bpm,
         midi = midi,
         notename = notename,
         octave = octave)
@@ -174,7 +174,7 @@ def get_or_create_tone_from_sample(
 def get_or_create_sample(
     inputfilepath=None,
     tone=None,
-    bmp = None,
+    bpm = None,
     midi = None,
     notename = None,
     octave = None):
@@ -189,7 +189,7 @@ def get_or_create_sample(
     return Sample(
         inputfilepath=inputfilepath,
         tone=tone,
-        bmp = bmp,
+        bpm = bpm,
         midi = midi,
         notename = notename,
         octave = octave)
@@ -238,12 +238,38 @@ with db_session:
 def main():
     import argparse
 
-    parser = argparse.ArgumentParser(description='Create Samples From a Folder of Stems.')
+    parser = argparse.ArgumentParser(
+        description='Load Samplesfor FoxDot.'
+        )
     parser.add_argument('path', metavar='PATH', type=str,
-                        help='Path to stems folder')
+                        help='inputfilepath')
 
     parser.add_argument('-b','--bpm', type=int, nargs='?', default=110,
-                        help='BPM of stems')
+                        help='BPM of sample')
+
+    parser.add_argument('-n','--note', type=str, nargs='?', default=None,
+                        help='Note name of sample')
+
+    parser.add_argument('-o','--octave', type=int, nargs='?', default=None,
+                        help='Octave of sample')
+
+    parser.add_argument('-m','--midi', type=int, nargs='?', default=None,
+                        help='Midi number of sample')
+
+    args = parser.parse_args()
+
+    with db_session:
+        t, s = get_or_create_tone_from_sample(
+            inputfilepath = os.path.abspath(args.path),
+            bpm=args.bpm,
+            notename = args.note,
+            octave = args.octave,
+            midi=args.midi
+        )
+
+    with db_session:
+        print(t.getNotePlayInfo(60))
+
 
 if __name__ == "__main__":
     main()
