@@ -193,47 +193,6 @@ def get_or_create_sample(
         midi = midi,
         notename = notename,
         octave = octave)
-'''
-with db_session:
-    t = get_or_create_tone('Fingered (bridge pickup) Rickenbacker bass (4001 - 1974)')
-
-    s1 = get_or_create_sample(
-        inputfilepath = "/home/meggleton/Downloads/Fingered (bridge pickup) Rickenbacker bass (4001 - 1974)/163021__project16__d-3-pp.wav",
-        tone=t,
-        notename = "D",
-        octave = 3)
-
-    s2 = get_or_create_sample(
-        inputfilepath = "/home/meggleton/Downloads/Fingered (bridge pickup) Rickenbacker bass (4001 - 1974)/162995__project16__f-3-pp.wav",
-        tone=t,
-        notename = "F",
-        octave = 3)
-
-    s3 = get_or_create_sample(
-        inputfilepath = "/home/meggleton/Downloads/Fingered (bridge pickup) Rickenbacker bass (4001 - 1974)/162969__project16__a2-pp.wav",
-        tone=t,
-        notename = "A",
-        octave = 2)
-'''
-
-with db_session:
-    t, s = get_or_create_tone_from_sample(
-        inputfilepath = "/home/meggleton/Downloads/Fingered (bridge pickup) Rickenbacker bass (4001 - 1974)/163021__project16__d-3-pp.wav",
-        notename = "D",
-        octave = 3)
-
-    t, s = get_or_create_tone_from_sample(
-        inputfilepath = "/home/meggleton/Downloads/Fingered (bridge pickup) Rickenbacker bass (4001 - 1974)/162995__project16__f-3-pp.wav",
-        notename = "F",
-        octave = 3)
-
-    t, s = get_or_create_tone_from_sample(
-        inputfilepath = "/home/meggleton/Downloads/Fingered (bridge pickup) Rickenbacker bass (4001 - 1974)/162969__project16__a2-pp.wav",
-        notename = "A",
-        octave = 2)
-
-    print(t.getNotePlayInfo(60))
-
 
 def main():
     import argparse
@@ -241,8 +200,10 @@ def main():
     parser = argparse.ArgumentParser(
         description='Load Samplesfor FoxDot.'
         )
-    parser.add_argument('path', metavar='PATH', type=str,
+    parser.add_argument('-p','--path', nargs='?', metavar='PATH', type=str,
                         help='inputfilepath')
+    #parser.add_argument('-f','--file', nargs='?', type=argparse.FileType('r'),
+    #                 default=sys.stdin)
 
     parser.add_argument('-b','--bpm', type=int, nargs='?', default=110,
                         help='BPM of sample')
@@ -256,20 +217,52 @@ def main():
     parser.add_argument('-m','--midi', type=int, nargs='?', default=None,
                         help='Midi number of sample')
 
+    parser.add_argument('-t','--test', action='store_true', help="Run test suite")
+    parser.add_argument('-l','--list', action='store_true', help="List available tones")
+
+    # TODO: add -t for test
+    # TODO: add -l for list get_or_create_tone_from_sample
+
     args = parser.parse_args()
 
-    with db_session:
-        t, s = get_or_create_tone_from_sample(
-            inputfilepath = os.path.abspath(args.path),
-            bpm=args.bpm,
-            notename = args.note,
-            octave = args.octave,
-            midi=args.midi
-        )
 
-    with db_session:
-        print(t.getNotePlayInfo(60))
+    if(args.path):
+        with db_session:
+            t, s = get_or_create_tone_from_sample(
+                inputfilepath = os.path.abspath(args.path),
+                bpm=args.bpm,
+                notename = args.note,
+                octave = args.octave,
+                midi=args.midi
+            )
 
+        with db_session:
+            print(t.getNotePlayInfo(60))
+
+    elif(args.test):
+        with db_session:
+            t, s = get_or_create_tone_from_sample(
+                inputfilepath = "/home/meggleton/Downloads/Fingered (bridge pickup) Rickenbacker bass (4001 - 1974)/163021__project16__d-3-pp.wav",
+                notename = "D",
+                octave = 3)
+
+            t, s = get_or_create_tone_from_sample(
+                inputfilepath = "/home/meggleton/Downloads/Fingered (bridge pickup) Rickenbacker bass (4001 - 1974)/162995__project16__f-3-pp.wav",
+                notename = "F",
+                octave = 3)
+
+            t, s = get_or_create_tone_from_sample(
+                inputfilepath = "/home/meggleton/Downloads/Fingered (bridge pickup) Rickenbacker bass (4001 - 1974)/162969__project16__a2-pp.wav",
+                notename = "A",
+                octave = 2)
+
+            print(t.getNotePlayInfo(60))
+
+    elif(args.list):
+        print('List')
+
+    else:
+        parser.print_usage()
 
 if __name__ == "__main__":
     main()
